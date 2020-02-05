@@ -1,10 +1,10 @@
 self.__precacheManifest = (self.__precacheManifest || []).concat([
   {
-    "revision": "0eb7c9a360bdd9d6dcab",
+    "revision": "7641f972e0d9fedaa4dc",
     "url": "/jive-community-promotion/css/app.be502927.css"
   },
   {
-    "revision": "b158e83e03d2efac5fdf",
+    "revision": "12d235f5cc14ddd59418",
     "url": "/jive-community-promotion/css/chunk-63168e5e.fcde7547.css"
   },
   {
@@ -12,7 +12,7 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/jive-community-promotion/img/logo.82b9c7a5.png"
   },
   {
-    "revision": "a094bcd23bb55bc642e3824c6ba8ca7d",
+    "revision": "48d3ce88915b9c48ef6ba1dd5dbadda9",
     "url": "/jive-community-promotion/index.html"
   },
   {
@@ -20,12 +20,12 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/jive-community-promotion/js/about.70c98881.js"
   },
   {
-    "revision": "0eb7c9a360bdd9d6dcab",
-    "url": "/jive-community-promotion/js/app.9e8d1672.js"
+    "revision": "7641f972e0d9fedaa4dc",
+    "url": "/jive-community-promotion/js/app.ebdbf39d.js"
   },
   {
-    "revision": "b158e83e03d2efac5fdf",
-    "url": "/jive-community-promotion/js/chunk-63168e5e.8e6eff41.js"
+    "revision": "12d235f5cc14ddd59418",
+    "url": "/jive-community-promotion/js/chunk-63168e5e.fe9c3521.js"
   },
   {
     "revision": "24673cfcda9096742728",

@@ -14,7 +14,7 @@
 importScripts("https://storage.googleapis.com/workbox-cdn/releases/4.3.1/workbox-sw.js");
 
 importScripts(
-  "/jive-community-promotion/precache-manifest.a74a782dee83701c78c38f9e455841e7.js"
+  "/jive-community-promotion/precache-manifest.44273eaa9a1f91be122fd77ec78fae4c.js"
 );
 
 workbox.core.setCacheNameDetails({prefix: "plazza-community-promotion"});
