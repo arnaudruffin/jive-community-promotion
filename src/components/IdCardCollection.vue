@@ -1,18 +1,18 @@
 <template>
 
     <div class="stat">
-        <h1>{{ $route.params.id }}</h1>
+        <!--<h1 class="zoomTarget">{{ $route.params.id }}</h1>-->
         <Loader v-if="loading"/>
         <div v-if="loading" class="loading">Loading...</div>
 
         <div v-if="error" class="error">{{ error }}</div>
 
         <div v-if="stat" class="content">
-            <ul id="example-1">
-                <li v-for="item in stat" v-bind:key="item.id" class="idcard">
-                    <IdCard :display-name="item.displayName" :photo="item.picture" :tags="item.skills_ellipsis"/>
-                </li>
 
+            <ul id="example-1">
+                <li v-for="item in stat" v-bind:key="item.id" class="idcard" :id="item.id">
+                    <IdCard class="zoomTarget" data-targetsize="0.65" data-duration="600" :display-name="item.displayName" :photo="item.picture" :tags="item.skills_ellipsis"/>
+                </li>
             </ul>
         </div>
     </div>
@@ -24,7 +24,8 @@
     import IdCard from '@/components/IdCard.vue'
     import * as request from "request";
     import {Response} from "request";
-    import {VUE_APP_PROX} from "../main"
+    import {VUE_APP_PROX} from "../main";
+
 
     @Component({
         components: {Loader,IdCard}
@@ -85,8 +86,18 @@
                     } );
                     this.stat = data;
                     this.$log.debug('content retrieved: ', this.stat);
+
                 }
             });
+        }
+
+        updated() {
+            this.$nextTick(function () {
+                // Code that will run only after the
+                // entire view has been re-rendered
+                // @ts-ignore
+                window.$(".zoomTarget").zoomTarget();
+            })
         }
     }
 
