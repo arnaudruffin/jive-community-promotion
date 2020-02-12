@@ -1,11 +1,12 @@
 <template>
     <div id="app">
         <wordcloud v-if="words"
-                :data="words"
-                nameKey="name"
-                valueKey="value"
-                color="Accent">
-        </wordcloud>
+                   :data="words"
+                   nameKey="name"
+                   valueKey="value"
+                   :color="myColors"
+                   :showTooltip="false"
+        />
     </div>
 </template>
 
@@ -23,6 +24,7 @@
         }
     })
     export default class TagWordCloud extends Vue {
-        @Prop({default: [{name:"welcome",value:100}]}) private words: WordCount[] | undefined
+        @Prop({default: [{name: "welcome", value: 100}]}) private words: WordCount[] | undefined
+        myColors= ['#1f77b4', '#629fc9', '#94bedb', '#c9e0ef']
     }
 </script>

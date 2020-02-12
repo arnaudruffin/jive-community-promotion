@@ -4,6 +4,8 @@ import IdCardCollection from "*.vue";
         <Loader v-if="loading"/>
         <div v-if="loading" class="loading">Loading...</div>
         <div v-if="error" class="error">{{ error }}</div>
+
+        <p v-if="tagStags" > {{count_members}} members </p>
         <TagWordCloud v-if="tagStags" :words="tagStags"/>
     </div>
 </template>
