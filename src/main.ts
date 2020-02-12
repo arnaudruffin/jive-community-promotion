@@ -3,7 +3,7 @@ import App from './App.vue'
 import router from './router'
 import VueLogger from 'vuejs-logger';
 
-
+//TODO handle max in request query (if more than 100)
 
 const isProduction = process.env.NODE_ENV === 'production';
 

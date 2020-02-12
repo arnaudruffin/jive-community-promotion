@@ -1,11 +1,10 @@
 import IdCardCollection from "*.vue";
 <template>
     <div class="stats">
+        <div v-if="error" class="error">{{ error }}</div>
         <Loader v-if="loading"/>
         <div v-if="loading" class="loading">Loading...</div>
-        <div v-if="error" class="error">{{ error }}</div>
-
-        <div v-if="tagStags">
+        <div v-else-if="tagStags" >
 
             <p>
             <label for="total">{{count_members}} / {{count_objective}} members </label>
@@ -37,11 +36,9 @@ import IdCardCollection from "*.vue";
     import TagWordCloud from "@/components/TagWordCloud.vue";
     import WordCount from "@/WordCount";
     import Loader from '@/components/Loader.vue'
-    //@ts-ignore
-    import RadialProgressBar from 'vue-radial-progress'
 
     @Component({
-        components: {TagWordCloud,Loader,RadialProgressBar}
+        components: {TagWordCloud,Loader}
     })
     export default class Stats extends Vue {
 
@@ -53,7 +50,8 @@ import IdCardCollection from "*.vue";
 
         error = null;
 
-        //TODO as query params
+        //TODO autorefresh
+        //TODO as query params, but with default values
         count_objective = 100;
         count_tag_objective = 3; //should be >= to count
 
@@ -73,7 +71,7 @@ import IdCardCollection from "*.vue";
             this.count_members = 0;
             this.count_members_with_pictures = 0;
             this.count_members_with_at_least_N_tags = 0;
-            this.tagStags = []
+            this.tagStags = [];
             const skills:any = [];
 
             const url = VUE_APP_PROX + "/api/core/v3/search/people?sort=updatedDesc&fields=id,type,thumbnailUrl,displayName,photos,tags&filter=tag(" + tag + ")&filter=search%28%2A%29&origin=spotlight&startIndex=0&count=100";
@@ -116,11 +114,10 @@ import IdCardCollection from "*.vue";
 
                   }, {} );
 
-                  this.$log.info('tag stats: ', counts);
+                  this.$log.debug('tag stats: ', counts);
                   //Object.keys(counts).forEach(e => this.tagStags.push({name: e , value:counts[e]}));
                   Object.keys(counts).forEach(e => this.tagStags.push({name: e , value:counts[e]} as WordCount));
                   this.$log.info('formatted tag stats: ', this.tagStags);
-
                 }
             });
         }

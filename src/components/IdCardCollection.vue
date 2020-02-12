@@ -26,6 +26,7 @@
     import {Response} from "request";
     import {VUE_APP_PROX} from "../main";
 
+    //TODO handle autorefresh data
 
     @Component({
         components: {Loader,IdCard}
