@@ -23,7 +23,8 @@ const routes = [
     name: 'stats',
     component: () => import('../views/Trombi.vue')
   },
-  { path: '/tag/:id/trombi', component: () => import('../views/Trombi.vue') }
+  { path: '/tag/:id/trombi', component: () => import('../views/Trombi.vue') },
+  { path: '/tag/:id/stats', component: () => import('../views/Stats.vue') }
 ];
 
 const router = new VueRouter({

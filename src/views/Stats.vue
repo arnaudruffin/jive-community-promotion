@@ -1,18 +1,100 @@
+import IdCardCollection from "*.vue";
 <template>
-  <div class="trombi">
-    <IdCardCollection msg="rocking it"/>
-  </div>
+    <div class="stats">
+        <Loader v-if="loading"/>
+        <div v-if="loading" class="loading">Loading...</div>
+        <div v-if="error" class="error">{{ error }}</div>
+        <TagWordCloud v-if="tagStags" :words="tagStags"/>
+    </div>
 </template>
 
-<script>
-// @ is an alias to /src
-import IdCardCollection from '@/components/IdCardCollection.vue'
+<script lang="ts">
 
 
-export default {
-  name: 'stats',
-  components: {
-    IdCardCollection
-  }
-}
+    import {Component, Vue, Watch} from "vue-property-decorator";
+    import {VUE_APP_PROX} from "../main";
+    import * as request from "request";
+    import {Response} from "request";
+    import TagWordCloud from "@/components/TagWordCloud.vue";
+    import WordCount from "@/WordCount";
+    import Loader from '@/components/Loader.vue'
+
+    @Component({
+        components: {TagWordCloud,Loader}
+    })
+    export default class Stats extends Vue {
+
+        loading = false;
+        tagStags: WordCount[] = [];
+        count_members = 0;
+        count_members_with_pictures = 0;
+        count_members_with_at_least_N_tags = 0;
+        error = null;
+
+        mounted() {
+            this.loadData(this.$route.params.id)
+        }
+
+        @Watch('$route.params.id')
+        onRouteChanged(val: string) {
+            this.loadData(val)
+        }
+
+        private loadData(tag: string) {
+            this.$log.debug("Loading data for tag ", tag);
+            this.error = null;
+            this.loading = true;
+            this.count_members = 0;
+            this.count_members_with_pictures = 0;
+            this.count_members_with_at_least_N_tags = 0;
+            this.tagStags = []
+            const skills:any = [];
+
+            const url = VUE_APP_PROX + "/api/core/v3/search/people?sort=updatedDesc&fields=id,type,thumbnailUrl,displayName,photos,tags&filter=tag(" + tag + ")&filter=search%28%2A%29&origin=spotlight&startIndex=0&count=100";
+            request.get(url, (error: any, response: Response, body: any) => {
+                this.loading = false;
+                if (error) {
+                    this.$log.error("Can't retrieve data");
+                    this.$log.error(error);
+                    this.error = error;
+                    this.loading = false;
+                } else {
+                    let data = JSON.parse(body).list;
+
+                    // @ts-ignore
+                    data.forEach(item => {
+                        this.count_members++;
+
+                        if (item.photos) {
+                            this.count_members_with_pictures++;
+                        }
+                        let tags = item.tags.filter((el: string) => {return el !== tag});
+                        this.$log.info('tags: ', tags);
+                        skills.push(tags);
+                    });
+
+                  let flattenSkills = [].concat.apply([], skills);
+                  const counts = flattenSkills.reduce(function ( stats:any, word:string ) {
+                    if ( stats.hasOwnProperty( word ) ) {
+                      stats[ word ] = stats[ word ] + 1;
+                    } else {
+
+                      stats[ word ] = 1;
+                    }
+
+                    return stats;
+
+                  }, {} );
+
+                  this.$log.info('tag stats: ', counts);
+                  //Object.keys(counts).forEach(e => this.tagStags.push({name: e , value:counts[e]}));
+                  Object.keys(counts).forEach(e => this.tagStags.push({name: e , value:counts[e]} as WordCount));
+                  this.$log.info('formatted tag stats: ', this.tagStags);
+
+                }
+            });
+        }
+
+    }
+
 </script>

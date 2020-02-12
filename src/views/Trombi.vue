@@ -4,15 +4,16 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
 // @ is an alias to /src
-import IdCardCollection from '@/components/IdCardCollection.vue'
+import IdCardCollection from '../components/IdCardCollection.vue'
+import {Component, Vue} from "vue-property-decorator";
 
 
-export default {
-  name: 'stats',
-  components: {
-    IdCardCollection
-  }
+@Component({
+  components: {IdCardCollection}
+})
+export default class Trombi extends Vue {
+
 }
 </script>

@@ -47,7 +47,7 @@
 
         private loadData(tag: string) {
             this.$log.debug("Loading data for tag ", tag);
-            this.error = this.stat = null;
+            this.error = null;
             this.loading = true;
 
             const url =
@@ -63,6 +63,8 @@
                 if (error) {
                     this.$log.error("Can't retrieve data");
                     this.$log.error(error);
+                    this.error = error;
+                    this.loading = false;
                 } else {
                     let data = JSON.parse(body).list;
 
