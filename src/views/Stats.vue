@@ -5,7 +5,24 @@ import IdCardCollection from "*.vue";
         <div v-if="loading" class="loading">Loading...</div>
         <div v-if="error" class="error">{{ error }}</div>
 
-        <p v-if="tagStags" > {{count_members}} members </p>
+        <div v-if="tagStags">
+
+            <p>
+            <label for="total">{{count_members}} / {{count_objective}} members </label>
+            <progress id="total" :max="count_objective" :value="count_members"> 70% </progress>
+            </p>
+            <p>
+                <label for="total_pic">{{count_members_with_pictures}} / {{count_objective}} members with pictures </label>
+                <progress id="total_pic" :max="count_objective" :value="count_members_with_pictures"> 70% </progress>
+            </p>
+            <p>
+                <label for="total_tags">{{count_members_with_at_least_N_tags}} / {{count_objective}} members with at least {{count_tag_objective}} tags </label>
+                <progress id="total_tags" :max="count_objective" :value="count_members_with_at_least_N_tags"> 70% </progress>
+            </p>
+        </div>
+
+
+
         <TagWordCloud v-if="tagStags" :words="tagStags"/>
     </div>
 </template>
@@ -20,9 +37,11 @@ import IdCardCollection from "*.vue";
     import TagWordCloud from "@/components/TagWordCloud.vue";
     import WordCount from "@/WordCount";
     import Loader from '@/components/Loader.vue'
+    //@ts-ignore
+    import RadialProgressBar from 'vue-radial-progress'
 
     @Component({
-        components: {TagWordCloud,Loader}
+        components: {TagWordCloud,Loader,RadialProgressBar}
     })
     export default class Stats extends Vue {
 
@@ -31,7 +50,12 @@ import IdCardCollection from "*.vue";
         count_members = 0;
         count_members_with_pictures = 0;
         count_members_with_at_least_N_tags = 0;
+
         error = null;
+
+        //TODO as query params
+        count_objective = 100;
+        count_tag_objective = 3; //should be >= to count
 
         mounted() {
             this.loadData(this.$route.params.id)
@@ -70,8 +94,12 @@ import IdCardCollection from "*.vue";
                         if (item.photos) {
                             this.count_members_with_pictures++;
                         }
+
+
                         let tags = item.tags.filter((el: string) => {return el !== tag});
-                        this.$log.info('tags: ', tags);
+                        if(tags.length>= this.count_tag_objective){
+                            this.count_members_with_at_least_N_tags++;
+                        }
                         skills.push(tags);
                     });
 
