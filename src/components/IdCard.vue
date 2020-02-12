@@ -75,9 +75,9 @@
         width:25px;
         background: rgba(255, 255, 255, .2);
         background-image:
-                linear-gradient(left, rgba(255,255,255, .4) 0%, rgba(255,255,255, .1) 50%,rgba(255,255,255, .4) 100%),
-                linear-gradient(bottom, rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, 0) 40%),
-                linear-gradient(top, rgba(255, 255, 255, .8) 0%, rgba(255, 255, 255, 0) 40%)
+                linear-gradient(to right, rgba(255,255,255, .4) 0%, rgba(255,255,255, .1) 50%,rgba(255,255,255, .4) 100%),
+                linear-gradient(to top, rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, 0) 40%),
+                linear-gradient(to bottom, rgba(255, 255, 255, .8) 0%, rgba(255, 255, 255, 0) 40%)
     ;
         border-radius:2px;
         box-shadow:0 0 0 1px rgba(0, 0, 0, .8);
@@ -131,7 +131,7 @@
         width:100%;
         height:3px;
         background:
-                linear-gradient(bottom, rgba(255,255,255, .1) 0%, rgba(255,255,255,.05) 70%, rgba(255,255,255,0) 100%);
+                linear-gradient(to top, rgba(255,255,255, .1) 0%, rgba(255,255,255,.05) 70%, rgba(255,255,255,0) 100%);
     }
 
     /* card hole */
