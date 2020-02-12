@@ -1,13 +1,14 @@
-# plazza-community-promotion
+# plazza-community-promotion ![github pages](https://github.com/arnaudruffin/jive-community-promotion/workflows/github%20pages/badge.svg)
+https://arnaudruffin.github.io/jive-community-promotion
 
 ## Project setup
 ```
-npm install
+ npm install
 ```
 
 ### Compiles and hot-reloads for development
 ```
-npm run serve
+export VUE_APP_PROX= xxx && npm run serve
 ```
 
 ### Compiles and minifies for production
