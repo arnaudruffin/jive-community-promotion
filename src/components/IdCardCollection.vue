@@ -1,6 +1,6 @@
 <template>
 
-    <div class="stat">
+    <div class="stat" id="card-collection">
         <!--<h1 class="zoomTarget">{{ $route.params.id }}</h1>-->
         <Loader v-if="loading"/>
         <div v-if="loading" class="loading">Loading...</div>
@@ -10,8 +10,9 @@
         <div v-if="stat" class="content">
 
             <ul id="example-1">
-                <li v-for="item in stat" v-bind:key="item.id" class="idcard" :id="item.id">
-                    <IdCard class="zoomTarget" data-targetsize="0.65" data-duration="600" :display-name="item.displayName" :photo="item.picture" :tags="item.skills_ellipsis"/>
+                <li v-for="item in stat" v-bind:key="item.id" >
+                    <IdCard class="zoomTarget idcard" data-targetsize="0.65" data-duration="600" :id="item.id"
+                            :display-name="item.displayName" :photo="item.picture" :tags="item.skills_ellipsis"/>
                 </li>
             </ul>
         </div>
@@ -29,7 +30,7 @@
     //TODO handle autorefresh data
 
     @Component({
-        components: {Loader,IdCard}
+        components: {Loader, IdCard}
     })
     export default class IdCardCollection extends Vue {
 
@@ -37,13 +38,35 @@
         stat = null;
         error = null;
 
+        //autobrowsing
+        lastElement: any = undefined;
+        handle: any = 0;
+
         mounted() {
+            // @ts-ignore
+            window.$.fn.random = function () {
+                let randomIndex = Math.floor(Math.random() * this.length);
+                // @ts-ignore
+                return window.$(this[randomIndex]);
+            }
+            this.loadDataAndRegisterBrowsing(this.$route.params.id);
             this.loadData(this.$route.params.id)
+        }
+
+        private loadDataAndRegisterBrowsing(tag: string) {
+            this.loadData(tag);
+            this.registerAutobrowse();
         }
 
         @Watch('$route.params.id')
         onRouteChanged(val: string) {
-            this.loadData(val)
+            this.$log.debug("route changed");
+            this.loadData(val);
+        }
+
+        @Watch('$route.query.autobrowse')
+        onAutoBrowseChanged(val: string) {
+            this.registerAutobrowse();
         }
 
         private loadData(tag: string) {
@@ -52,7 +75,7 @@
             this.loading = true;
 
             const url =
-                VUE_APP_PROX+"/api/core/v3/search/people?sort=updatedDesc&fields=id,type,thumbnailUrl,displayName,photos,tags&filter=tag(" + tag + ")&filter=search%28%2A%29&origin=spotlight&startIndex=0&count=100";
+                VUE_APP_PROX + "/api/core/v3/search/people?sort=updatedDesc&fields=id,type,thumbnailUrl,displayName,photos,tags&filter=tag(" + tag + ")&filter=search%28%2A%29&origin=spotlight&startIndex=0&count=100";
             let headers: request.Headers = {
                 //"Content-Type": "text/plain",
                 // "Content-Type": "application/json",
@@ -70,23 +93,25 @@
                     let data = JSON.parse(body).list;
 
                     // @ts-ignore
-                    data.forEach(item =>{
-                        if(item.photos){
+                    data.forEach(item => {
+                        if (item.photos) {
                             item.picture = item.photos[0].value
-                        }else{
+                        } else {
                             item.picture = "https://vignette.wikia.nocookie.net/leon-smallwood/images/e/e2/UNKNOWN_PERSON.png/revision/latest?cb=20150903003647"
                         }
-                        item.skills = item.tags.filter( (el: string) => {return el !== tag}).slice(0,4);
-                        if(item.tags.length > 5){
+                        item.skills = item.tags.filter((el: string) => {
+                            return el !== tag
+                        }).slice(0, 4);
+                        if (item.tags.length > 5) {
                             this.$log.debug("adding .... on skills");
                             item.skills.push("...")
-                        }else if (item.skills && item.skills.length === 0){
+                        } else if (item.skills && item.skills.length === 0) {
                             this.$log.debug("adding ??? on skills");
                             item.skills.push("???")
                         }
-                        item.skills_ellipsis = item.skills.map((input: string) => input.length > 24 ? input=`${input.substring(0, 21)}...` : input);
+                        item.skills_ellipsis = item.skills.map((input: string) => input.length > 24 ? input = `${input.substring(0, 21)}...` : input);
                         this.$log.debug("skills: ", item.skills_ellipsis);
-                    } );
+                    });
                     this.stat = data;
                     this.$log.debug('content retrieved: ', this.stat);
 
@@ -101,6 +126,34 @@
                 // @ts-ignore
                 window.$(".zoomTarget").zoomTarget();
             })
+        }
+
+        private registerAutobrowse() {
+            if (this.handle) {
+                this.$log.debug("autobrowse - clearing last autobrowse");
+                clearInterval(this.handle)
+            }
+
+            if (this.$route.query.autobrowse && this.$route.query.autobrowse !== "false") {
+                this.$log.debug("autobrowse - registering auto browse");
+                this.handle = setInterval(() => {
+
+                    if (this.lastElement) {
+                        this.$log.debug("autobrowse - handling unzoom, last element: ", this.lastElement);
+                        // @ts-ignore
+                        window.$('#card-collection').click();
+                        this.lastElement = undefined
+                    } else {
+                        this.$log.debug("autobrowse - zooming on random element");
+                        // @ts-ignore
+                        let newElement = window.$('.idcard').random();
+                        this.$log.debug("autobrowse", newElement);
+                        newElement.click();
+
+                        this.lastElement = newElement
+                    }
+                }, 5000);
+            }
         }
     }
 
