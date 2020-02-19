@@ -4,25 +4,27 @@ import IdCardCollection from "*.vue";
         <div v-if="error" class="error">{{ error }}</div>
         <Loader v-if="loading"/>
         <div v-if="loading" class="loading">Loading...</div>
-        <div v-else-if="tagStags" >
+        <div v-else-if="tagStatistics.wordCounts">
 
             <p>
-            <label for="total">{{count_members}} / {{count_objective}} members </label>
-            <progress id="total" :max="count_objective" :value="count_members"> 70% </progress>
+                <label for="total">{{count_members}} / {{count_objective}} members </label>
+                <progress id="total" :max="count_objective" :value="count_members"> 70%</progress>
             </p>
             <p>
-                <label for="total_pic">{{count_members_with_pictures}} / {{count_objective}} members with pictures </label>
-                <progress id="total_pic" :max="count_objective" :value="count_members_with_pictures"> 70% </progress>
+                <label for="total_pic">{{count_members_with_pictures}} / {{count_objective}} members with
+                    pictures </label>
+                <progress id="total_pic" :max="count_objective" :value="count_members_with_pictures"> 70%</progress>
             </p>
             <p>
-                <label for="total_tags">{{count_members_with_at_least_N_tags}} / {{count_objective}} members with at least {{count_tag_objective}} tags </label>
-                <progress id="total_tags" :max="count_objective" :value="count_members_with_at_least_N_tags"> 70% </progress>
+                <label for="total_tags">{{count_members_with_at_least_N_tags}} / {{count_objective}} members with at
+                    least {{count_tag_objective}} tags </label>
+                <progress id="total_tags" :max="count_objective" :value="count_members_with_at_least_N_tags"> 70%
+                </progress>
             </p>
         </div>
 
 
-
-        <TagWordCloud v-if="tagStags" :words="tagStags"/>
+        <TagWordCloud v-if="tagStatistics.wordCounts" :words="tagStatistics.wordCounts"/>
     </div>
 </template>
 
@@ -30,23 +32,25 @@ import IdCardCollection from "*.vue";
 
 
     import {Component, Vue, Watch} from "vue-property-decorator";
-    import {VUE_APP_PROX} from "../main";
-    import * as request from "request";
     import {Response} from "request";
     import TagWordCloud from "@/components/TagWordCloud.vue";
-    import WordCount from "@/WordCount";
+    import WordCount from "@/model/WordCount";
     import Loader from '@/components/Loader.vue'
+    import ApiClient from "@/ApiClient";
+    import TagStatistics from "@/model/TagStatistics";
 
     @Component({
-        components: {TagWordCloud,Loader}
+        components: {TagWordCloud, Loader}
     })
     export default class Stats extends Vue {
 
         loading = false;
-        tagStags: WordCount[] = [];
+
         count_members = 0;
         count_members_with_pictures = 0;
         count_members_with_at_least_N_tags = 0;
+
+        tagStatistics: TagStatistics = {top5members: {}, wordCounts:[]};
 
         error = null;
 
@@ -71,11 +75,12 @@ import IdCardCollection from "*.vue";
             this.count_members = 0;
             this.count_members_with_pictures = 0;
             this.count_members_with_at_least_N_tags = 0;
-            this.tagStags = [];
-            const skills:any = [];
 
-            const url = VUE_APP_PROX + "/api/core/v3/search/people?sort=updatedDesc&fields=id,type,thumbnailUrl,displayName,photos,tags&filter=tag(" + tag + ")&filter=search%28%2A%29&origin=spotlight&startIndex=0&count=100";
-            request.get(url, (error: any, response: Response, body: any) => {
+            this.tagStatistics = {top5members: {}, wordCounts:[]};
+
+            const skills: any = [];
+            const t99 = performance.now();
+            ApiClient.loadPeopleFromCommunity(tag, (error: any, response: Response, body: any) => {
                 this.loading = false;
                 if (error) {
                     this.$log.error("Can't retrieve data");
@@ -83,6 +88,7 @@ import IdCardCollection from "*.vue";
                     this.error = error;
                     this.loading = false;
                 } else {
+                    var t0 = performance.now();
                     let data = JSON.parse(body).list;
 
                     // @ts-ignore
@@ -94,30 +100,68 @@ import IdCardCollection from "*.vue";
                         }
 
 
-                        let tags = item.tags.filter((el: string) => {return el !== tag});
-                        if(tags.length>= this.count_tag_objective){
+                        let tags = item.tags.filter((el: string) => {
+                            return el !== tag
+                        });
+                        if (tags.length >= this.count_tag_objective) {
                             this.count_members_with_at_least_N_tags++;
                         }
                         skills.push(tags);
                     });
 
-                  let flattenSkills = [].concat.apply([], skills);
-                  const counts = flattenSkills.reduce(function ( stats:any, word:string ) {
-                    if ( stats.hasOwnProperty( word ) ) {
-                      stats[ word ] = stats[ word ] + 1;
-                    } else {
+                    let flattenSkills = [].concat.apply([], skills);
+                    const counts = flattenSkills.reduce(function (stats: any, word: string) {
+                        if (stats.hasOwnProperty(word)) {
+                            stats[word] = stats[word] + 1;
+                        } else {
 
-                      stats[ word ] = 1;
-                    }
+                            stats[word] = 1;
+                        }
+                        return stats;
+                    }, {});
 
-                    return stats;
+                    this.$log.debug('tag stats: ', counts);
+                    Object.keys(counts).forEach(e => this.tagStatistics.wordCounts.push({name: e, value: counts[e]} as WordCount));
+                    this.$log.info('formatted tag stats: ', this.tagStatistics.wordCounts);
 
-                  }, {} );
+                    const t1 = performance.now();
+                    //search for top 5
+                    // Create items array
+                    let items = Object.keys(counts).map(function (key) {
+                        return [key, counts[key]];
+                    });
 
-                  this.$log.debug('tag stats: ', counts);
-                  //Object.keys(counts).forEach(e => this.tagStags.push({name: e , value:counts[e]}));
-                  Object.keys(counts).forEach(e => this.tagStags.push({name: e , value:counts[e]} as WordCount));
-                  this.$log.info('formatted tag stats: ', this.tagStags);
+                    // Sort the array based on the second element
+                    items.sort(function (first, second) {
+                        return second[1] - first[1];
+                    });
+
+                    // Create a new array with only the first 5 items
+                    const top5 = items.slice(0, 5);
+                    this.$log.debug('top 5 stats: ',top5);
+
+
+                    top5.forEach(top => {
+                        this.tagStatistics.top5members[top[0]] = [];
+
+                    });
+
+                    // @ts-ignore
+                    data.forEach(item => {
+                        top5.forEach(top => {
+                            if (item.tags.indexOf(top[0]) > -1) {
+                                this.tagStatistics.top5members[top[0]].push(item.displayName)
+                            }
+                        });
+                    });
+
+                    this.$log.debug('top 5 members : ', this.tagStatistics.top5members);
+                    const t2 = performance.now();
+
+                    this.$log.debug("network query ",(t0 - t99));
+                    this.$log.debug("parsing réponse pour le nuage ",(t1 - t0));
+                    this.$log.debug("parsing réponse pour le top 5 ",(t2 - t1));
+
                 }
             });
         }

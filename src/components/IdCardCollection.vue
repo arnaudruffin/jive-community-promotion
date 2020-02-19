@@ -26,8 +26,8 @@
     import * as request from "request";
     import {Response} from "request";
     import {VUE_APP_PROX} from "../main";
+    import ApiClient from "@/ApiClient";
 
-    //TODO handle autorefresh data
 
     @Component({
         components: {Loader, IdCard}
@@ -38,24 +38,8 @@
         stat = null;
         error = null;
 
-        //autobrowsing
-        lastElement: any = undefined;
-        handle: any = 0;
-
         mounted() {
-            // @ts-ignore
-            window.$.fn.random = function () {
-                let randomIndex = Math.floor(Math.random() * this.length);
-                // @ts-ignore
-                return window.$(this[randomIndex]);
-            }
-            this.loadDataAndRegisterBrowsing(this.$route.params.id);
             this.loadData(this.$route.params.id)
-        }
-
-        private loadDataAndRegisterBrowsing(tag: string) {
-            this.loadData(tag);
-            this.registerAutobrowse();
         }
 
         @Watch('$route.params.id')
@@ -64,25 +48,12 @@
             this.loadData(val);
         }
 
-        @Watch('$route.query.autobrowse')
-        onAutoBrowseChanged(val: string) {
-            this.registerAutobrowse();
-        }
-
         private loadData(tag: string) {
             this.$log.debug("Loading data for tag ", tag);
             this.error = null;
             this.loading = true;
 
-            const url =
-                VUE_APP_PROX + "/api/core/v3/search/people?sort=updatedDesc&fields=id,type,thumbnailUrl,displayName,photos,tags&filter=tag(" + tag + ")&filter=search%28%2A%29&origin=spotlight&startIndex=0&count=100";
-            let headers: request.Headers = {
-                //"Content-Type": "text/plain",
-                // "Content-Type": "application/json",
-                //"Access-Control-Allow-Origin": '*'
-
-            };
-            request.get(url, {headers: headers}, (error: any, response: Response, body: any) => {
+            ApiClient.loadPeopleFromCommunity(tag,(error: any, response: Response, body: any) => {
                 this.loading = false;
                 if (error) {
                     this.$log.error("Can't retrieve data");
@@ -117,6 +88,9 @@
 
                 }
             });
+
+
+
         }
 
         updated() {
@@ -128,33 +102,6 @@
             })
         }
 
-        private registerAutobrowse() {
-            if (this.handle) {
-                this.$log.debug("autobrowse - clearing last autobrowse");
-                clearInterval(this.handle)
-            }
-
-            if (this.$route.query.autobrowse && this.$route.query.autobrowse !== "false") {
-                this.$log.debug("autobrowse - registering auto browse");
-                this.handle = setInterval(() => {
-
-                    if (this.lastElement) {
-                        this.$log.debug("autobrowse - handling unzoom, last element: ", this.lastElement);
-                        // @ts-ignore
-                        window.$('#card-collection').click();
-                        this.lastElement = undefined
-                    } else {
-                        this.$log.debug("autobrowse - zooming on random element");
-                        // @ts-ignore
-                        let newElement = window.$('.idcard').random();
-                        this.$log.debug("autobrowse", newElement);
-                        newElement.click();
-
-                        this.lastElement = newElement
-                    }
-                }, 5000);
-            }
-        }
     }
 
 </script>

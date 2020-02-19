@@ -16,7 +16,7 @@
     import {Component, Prop, Vue} from "vue-property-decorator";
     //@ts-ignore
     import wordcloud from "vue-wordcloud"
-    import WordCount from "@/WordCount";
+    import WordCount from "@/model/WordCount";
 
     @Component({
         components: {
@@ -24,7 +24,7 @@
         }
     })
     export default class TagWordCloud extends Vue {
-        @Prop({default: [{name: "welcome", value: 100}]}) private words: WordCount[] | undefined;
+        @Prop({default: [{name: "empty", value: 100}]}) private words: WordCount[] | undefined;
         myColors= ['#1f77b4', '#629fc9', '#94bedb', '#c9e0ef']
     }
 </script>
