@@ -38,6 +38,7 @@ import IdCardCollection from "*.vue";
     import Loader from '@/components/Loader.vue'
     import ApiClient from "@/ApiClient";
     import TagStatistics from "@/model/TagStatistics";
+    import PersonResponse from "@/model/PersonResponse";
 
     @Component({
         components: {TagWordCloud, Loader}
@@ -54,7 +55,6 @@ import IdCardCollection from "*.vue";
 
         error = null;
 
-        //TODO autorefresh
         //TODO as query params, but with default values
         count_objective = 100;
         count_tag_objective = 3; //should be >= to count
@@ -79,7 +79,6 @@ import IdCardCollection from "*.vue";
             this.tagStatistics = {top5members: {}, wordCounts:[]};
 
             const skills: any = [];
-            const t99 = performance.now();
             ApiClient.loadPeopleFromCommunity(tag, (error: any, response: Response, body: any) => {
                 this.loading = false;
                 if (error) {
@@ -88,17 +87,13 @@ import IdCardCollection from "*.vue";
                     this.error = error;
                     this.loading = false;
                 } else {
-                    var t0 = performance.now();
-                    let data = JSON.parse(body).list;
-
-                    // @ts-ignore
+                    let data: PersonResponse[] = JSON.parse(body).list;
                     data.forEach(item => {
                         this.count_members++;
 
                         if (item.photos) {
                             this.count_members_with_pictures++;
                         }
-
 
                         let tags = item.tags.filter((el: string) => {
                             return el !== tag
@@ -124,7 +119,6 @@ import IdCardCollection from "*.vue";
                     Object.keys(counts).forEach(e => this.tagStatistics.wordCounts.push({name: e, value: counts[e]} as WordCount));
                     this.$log.info('formatted tag stats: ', this.tagStatistics.wordCounts);
 
-                    const t1 = performance.now();
                     //search for top 5
                     // Create items array
                     let items = Object.keys(counts).map(function (key) {
@@ -156,11 +150,6 @@ import IdCardCollection from "*.vue";
                     });
 
                     this.$log.debug('top 5 members : ', this.tagStatistics.top5members);
-                    const t2 = performance.now();
-
-                    this.$log.debug("network query ",(t0 - t99));
-                    this.$log.debug("parsing réponse pour le nuage ",(t1 - t0));
-                    this.$log.debug("parsing réponse pour le top 5 ",(t2 - t1));
 
                 }
             });

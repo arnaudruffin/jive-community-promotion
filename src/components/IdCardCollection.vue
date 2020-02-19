@@ -10,7 +10,7 @@
         <div v-if="stat" class="content">
 
             <ul id="example-1">
-                <li v-for="item in stat" v-bind:key="item.id" >
+                <li v-for="item in stat" v-bind:key="item.id">
                     <IdCard class="zoomTarget idcard" data-targetsize="0.65" data-duration="600" :id="item.id"
                             :display-name="item.displayName" :photo="item.picture" :tags="item.skills_ellipsis"/>
                 </li>
@@ -23,11 +23,16 @@
     import {Component, Vue, Watch} from "vue-property-decorator";
     import Loader from '@/components/Loader.vue'
     import IdCard from '@/components/IdCard.vue'
-    import * as request from "request";
     import {Response} from "request";
-    import {VUE_APP_PROX} from "../main";
     import ApiClient from "@/ApiClient";
+    import PersonResponse from "@/model/PersonResponse";
 
+
+    interface EnhancedPersonResponse extends PersonResponse{
+        skills:string[],
+        picture:string,
+        skills_ellipsis:string[]
+    }
 
     @Component({
         components: {Loader, IdCard}
@@ -35,7 +40,7 @@
     export default class IdCardCollection extends Vue {
 
         loading = false;
-        stat = null;
+        stat: EnhancedPersonResponse[] = [];
         error = null;
 
         mounted() {
@@ -53,7 +58,7 @@
             this.error = null;
             this.loading = true;
 
-            ApiClient.loadPeopleFromCommunity(tag,(error: any, response: Response, body: any) => {
+            ApiClient.loadPeopleFromCommunity(tag, (error: any, response: Response, body: any) => {
                 this.loading = false;
                 if (error) {
                     this.$log.error("Can't retrieve data");
@@ -61,9 +66,8 @@
                     this.error = error;
                     this.loading = false;
                 } else {
-                    let data = JSON.parse(body).list;
-
-                    // @ts-ignore
+                    let data: EnhancedPersonResponse[] = JSON.parse(body).list;
+                    this.$log.debug(data);
                     data.forEach(item => {
                         if (item.photos) {
                             item.picture = item.photos[0].value
@@ -85,10 +89,8 @@
                     });
                     this.stat = data;
                     this.$log.debug('content retrieved: ', this.stat);
-
                 }
             });
-
 
 
         }
