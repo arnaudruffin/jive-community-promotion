@@ -7,18 +7,18 @@ import IdCardCollection from "*.vue";
         <div v-else-if="tagStatistics.wordCounts">
 
             <p>
-                <label for="total">{{count_members}} / {{count_objective}} members </label>
-                <progress id="total" :max="count_objective" :value="count_members"> 70%</progress>
+                <label for="total">{{countStatistics.members}} / {{count_objective}} members </label>
+                <progress id="total" :max="count_objective" :value="countStatistics.members"> 70%</progress>
             </p>
             <p>
-                <label for="total_pic">{{count_members_with_pictures}} / {{count_objective}} members with
+                <label for="total_pic">{{countStatistics.membersWithPictures}} / {{count_objective}} members with
                     pictures </label>
-                <progress id="total_pic" :max="count_objective" :value="count_members_with_pictures"> 70%</progress>
+                <progress id="total_pic" :max="count_objective" :value="countStatistics.membersWithPictures"> 70%</progress>
             </p>
             <p>
-                <label for="total_tags">{{count_members_with_at_least_N_tags}} / {{count_objective}} members with at
+                <label for="total_tags">{{countStatistics.membersWithASufficientAmountOfTags}} / {{count_objective}} members with at
                     least {{count_tag_objective}} tags </label>
-                <progress id="total_tags" :max="count_objective" :value="count_members_with_at_least_N_tags"> 70%
+                <progress id="total_tags" :max="count_objective" :value="countStatistics.membersWithASufficientAmountOfTags"> 70%
                 </progress>
             </p>
         </div>
@@ -39,6 +39,8 @@ import IdCardCollection from "*.vue";
     import ApiClient from "@/ApiClient";
     import TagStatistics from "@/model/TagStatistics";
     import PersonResponse from "@/model/PersonResponse";
+    import PersonResponseStatistics from "@/model/PersonResponseStatistics";
+    import CountStatistics from "@/model/CountStatistics";
 
     @Component({
         components: {TagWordCloud, Loader}
@@ -47,11 +49,11 @@ import IdCardCollection from "*.vue";
 
         loading = false;
 
-        count_members = 0;
-        count_members_with_pictures = 0;
-        count_members_with_at_least_N_tags = 0;
 
         tagStatistics: TagStatistics = {top5members: {}, wordCounts:[]};
+        countStatistics : CountStatistics = {  members: 0,
+            membersWithASufficientAmountOfTags: 0,
+            membersWithPictures: 0};
 
         error = null;
 
@@ -72,9 +74,6 @@ import IdCardCollection from "*.vue";
             this.$log.debug("Loading data for tag ", tag);
             this.error = null;
             this.loading = true;
-            this.count_members = 0;
-            this.count_members_with_pictures = 0;
-            this.count_members_with_at_least_N_tags = 0;
 
             this.tagStatistics = {top5members: {}, wordCounts:[]};
 
@@ -88,66 +87,10 @@ import IdCardCollection from "*.vue";
                     this.loading = false;
                 } else {
                     let data: PersonResponse[] = JSON.parse(body).list;
-                    data.forEach(item => {
-                        this.count_members++;
+                    let stats: PersonResponseStatistics = ApiClient.extractStatisticsFromPersonResponse(data,this.count_tag_objective,tag);
 
-                        if (item.photos) {
-                            this.count_members_with_pictures++;
-                        }
-
-                        let tags = item.tags.filter((el: string) => {
-                            return el !== tag
-                        });
-                        if (tags.length >= this.count_tag_objective) {
-                            this.count_members_with_at_least_N_tags++;
-                        }
-                        skills.push(tags);
-                    });
-
-                    let flattenSkills = [].concat.apply([], skills);
-                    const counts = flattenSkills.reduce(function (stats: any, word: string) {
-                        if (stats.hasOwnProperty(word)) {
-                            stats[word] = stats[word] + 1;
-                        } else {
-
-                            stats[word] = 1;
-                        }
-                        return stats;
-                    }, {});
-
-                    this.$log.debug('tag stats: ', counts);
-                    Object.keys(counts).forEach(e => this.tagStatistics.wordCounts.push({name: e, value: counts[e]} as WordCount));
-                    this.$log.info('formatted tag stats: ', this.tagStatistics.wordCounts);
-
-                    //search for top 5
-                    // Create items array
-                    let items = Object.keys(counts).map(function (key) {
-                        return [key, counts[key]];
-                    });
-
-                    // Sort the array based on the second element
-                    items.sort(function (first, second) {
-                        return second[1] - first[1];
-                    });
-
-                    // Create a new array with only the first 5 items
-                    const top5 = items.slice(0, 5);
-                    this.$log.debug('top 5 stats: ',top5);
-
-
-                    top5.forEach(top => {
-                        this.tagStatistics.top5members[top[0]] = [];
-
-                    });
-
-                    // @ts-ignore
-                    data.forEach(item => {
-                        top5.forEach(top => {
-                            if (item.tags.indexOf(top[0]) > -1) {
-                                this.tagStatistics.top5members[top[0]].push(item.displayName)
-                            }
-                        });
-                    });
+                    this.tagStatistics = stats.tags;
+                    this.countStatistics = stats.counts;
 
                     this.$log.debug('top 5 members : ', this.tagStatistics.top5members);
 
