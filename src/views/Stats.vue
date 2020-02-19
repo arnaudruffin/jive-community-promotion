@@ -30,11 +30,9 @@ import IdCardCollection from "*.vue";
 
 <script lang="ts">
 
-
     import {Component, Vue, Watch} from "vue-property-decorator";
     import {Response} from "request";
     import TagWordCloud from "@/components/TagWordCloud.vue";
-    import WordCount from "@/model/WordCount";
     import Loader from '@/components/Loader.vue'
     import ApiClient from "@/ApiClient";
     import TagStatistics from "@/model/TagStatistics";
@@ -46,18 +44,15 @@ import IdCardCollection from "*.vue";
         components: {TagWordCloud, Loader}
     })
     export default class Stats extends Vue {
-
+        error = null;
         loading = false;
-
 
         tagStatistics: TagStatistics = {top5members: {}, wordCounts:[]};
         countStatistics : CountStatistics = {  members: 0,
             membersWithASufficientAmountOfTags: 0,
             membersWithPictures: 0};
 
-        error = null;
-
-        //TODO as query params, but with default values
+        //TODO should be properties, set by queryparams if needed
         count_objective = 100;
         count_tag_objective = 3; //should be >= to count
 

@@ -21,19 +21,17 @@
     import HelloWorld from "@/components/HelloWorld.vue";
     import IdCardCollection from "@/components/IdCardCollection.vue";
     import Stats from "@/views/Stats.vue";
-
-
-
+    import RandomTop5TagMembers from "@/components/RandomTop5TagMembers.vue";
 
 
     @Component({
-        components: {HelloWorld,IdCardCollection,Stats}
+        components: {HelloWorld, IdCardCollection, Stats, RandomTop5TagMembers}
     })
     export default class Slideshow extends Vue {
 
 
         currentTab = "home";
-        tabs = ["home", "trombi", "stats"];
+        tabs = ["home", "trombi", "stats","random top tag"];
 
         get currentTabComponent() {
             switch (this.currentTab) {
@@ -41,12 +39,13 @@
                     return "IdCardCollection";
                 case "stats":
                     return "Stats";
+                case "random top tag":
+                    return "RandomTop5TagMembers";
                 default:
                     return "HelloWorld";
             }
 
         }
-
 
 
     }
@@ -64,12 +63,15 @@
         margin-bottom: -1px;
         margin-right: -1px;
     }
+
     .tab-button:hover {
         background: #e0e0e0;
     }
+
     .tab-button.active {
         background: #e0e0e0;
     }
+
     .tab {
         border: 1px solid #ccc;
         padding: 10px;
