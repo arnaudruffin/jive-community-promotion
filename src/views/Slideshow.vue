@@ -1,5 +1,6 @@
 <template>
-    <div id="dynamic-component-demo" class="demo">
+    <div id="dynamic-component-demo" >
+        <div class="demo" v-if="!hideTabs">
         <button
                 v-for="tab in tabs"
                 v-bind:key="tab"
@@ -8,8 +9,10 @@
         >
             {{ tab }}
         </button>
-
+        </div>
         <component v-bind:is="currentTabComponent" class="tab"></component>
+
+        <button v-on:click="animate()"> animate</button>
     </div>
 </template>
 
@@ -31,7 +34,12 @@
 
 
         currentTab = "home";
-        tabs = ["home", "trombi", "stats","random top tag"];
+        tabs = ["home", "trombi", "stats", "random top tag"];
+
+        animationHandle : any | null = null;
+        hideTabs = false;
+
+        TIMER_PERIOD=  process.env.NODE_ENV === 'production' ? 20000 : 6000;
 
         get currentTabComponent() {
             switch (this.currentTab) {
@@ -47,6 +55,23 @@
 
         }
 
+        nextTab(){
+            this.currentTab = this.tabs[this.tabs.indexOf(this.currentTab)+1 << 0]
+        }
+
+        animate() {
+            this.$log.debug("animate!");
+            if (this.animationHandle != null){
+                this.$log.debug("canceling animation");
+                this.hideTabs = false;
+               clearInterval(this.animationHandle);
+                this.animationHandle = null;
+            }else{
+                this.$log.debug("starting animation");
+                this.hideTabs = true;
+                this.animationHandle = setInterval(this.nextTab, this.TIMER_PERIOD);
+            }
+        }
 
     }
 
