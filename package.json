@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@types/request": "^2.48.4",
+    "easy-circular-progress": "^1.0.4",
     "register-service-worker": "^1.6.2",
     "request": "^2.88.0",
     "vue": "^2.6.10",
@@ -30,6 +31,8 @@
     "@vue/test-utils": "1.0.0-beta.29",
     "eslint": "^5.16.0",
     "eslint-plugin-vue": "^5.0.0",
+    "node-sass": "^4.13.1",
+    "sass-loader": "^8.0.2",
     "typescript": "~3.5.3",
     "vue-template-compiler": "^2.6.10"
   },
