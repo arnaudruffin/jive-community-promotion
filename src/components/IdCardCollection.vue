@@ -8,7 +8,7 @@
         <div v-if="error" class="error">{{ error }}</div>
 
         <div v-if="stat" class="content">
-
+            <h1>Community members</h1>
             <ul id="example-1">
                 <li v-for="item in stat" v-bind:key="item.id">
                     <IdCard class="zoomTarget idcard" data-targetsize="0.65" data-duration="600" :id="item.id"

@@ -4,7 +4,9 @@
         <Loader v-if="loading"/>
         <div v-if="loading" class="loading">Loading...</div>
         <div v-if="error" class="error">{{ error }}</div>
-        <h1 v-if="skillName">{{skillName}}</h1>
+
+        <h1>One of our top skill:</h1>
+        <h2 v-if="skillName">{{skillName}}</h2>
         <div v-if="people" class="content">
 
             <ul id="liste">

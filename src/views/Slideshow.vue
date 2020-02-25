@@ -23,19 +23,18 @@
     import {Component, Vue} from "vue-property-decorator";
     import HelloWorld from "@/components/HelloWorld.vue";
     import IdCardCollection from "@/components/IdCardCollection.vue";
-    import Goals from "@/components/Goals.vue";
     import Stats from "@/views/Stats.vue";
     import RandomTop5TagMembers from "@/components/RandomTop5TagMembers.vue";
 
 
     @Component({
-        components: {HelloWorld, IdCardCollection, Stats, RandomTop5TagMembers, Goals}
+        components: {HelloWorld, IdCardCollection, Stats, RandomTop5TagMembers}
     })
     export default class Slideshow extends Vue {
 
 
-        currentTab = "home";
-        tabs = ["home", "trombi", "stats", "random top tag", "goals"];
+        currentTab = "stats";
+        tabs = ["stats", "trombi","random top tag", "random member"];
 
         animationHandle : any | null = null;
         hideTabs = false;
@@ -50,8 +49,6 @@
                     return "Stats";
                 case "random top tag":
                     return "RandomTop5TagMembers";
-                case "goals":
-                    return "Goals";
                 default:
                     return "HelloWorld";
             }

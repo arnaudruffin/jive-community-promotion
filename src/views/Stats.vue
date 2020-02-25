@@ -6,21 +6,52 @@ import IdCardCollection from "*.vue";
         <div v-if="loading" class="loading">Loading...</div>
         <div v-else-if="tagStatistics.wordCounts">
 
-            <p>
-                <label for="total">{{countStatistics.members}} / {{count_objective}} members </label>
-                <progress id="total" :max="count_objective" :value="countStatistics.members"> 70%</progress>
-            </p>
-            <p>
-                <label for="total_pic">{{countStatistics.membersWithPictures}} / {{count_objective}} members with
-                    pictures </label>
-                <progress id="total_pic" :max="count_objective" :value="countStatistics.membersWithPictures"> 70%</progress>
-            </p>
-            <p>
-                <label for="total_tags">{{countStatistics.membersWithASufficientAmountOfTags}} / {{count_objective}} members with at
-                    least {{count_tag_objective}} tags </label>
-                <progress id="total_tags" :max="count_objective" :value="countStatistics.membersWithASufficientAmountOfTags"> 70%
-                </progress>
-            </p>
+            <h1>Statistics</h1>
+
+            <p></p>
+
+            <vue-circle
+                    :progress="55"
+                    :size="120"
+                    :reverse="false"
+                    line-cap="round"
+                    :fill="fill"
+                    empty-fill="rgba(0, 0, 0, .1)"
+                    :animation-start-value="0.0"
+                    :start-angle="90"
+                    insert-mode="append"
+                    :thickness="3"
+                    :show-percent="false">
+                53% with a photograph <br />📷
+            </vue-circle>
+            <vue-circle
+                    :progress="55"
+                    :size="190"
+                    :reverse="false"
+                    line-cap="round"
+                    :fill="green"
+                    empty-fill="rgba(0, 0, 0, .1)"
+                    :animation-start-value="0.0"
+                    :start-angle="90"
+                    insert-mode="append"
+                    :thickness="5"
+                    :show-percent="false">
+                <h3>55 membres</h3> we're hoping for 134  <br /> 😉
+            </vue-circle>
+            <vue-circle
+                    :progress="55"
+                    :size="120"
+                    :reverse="false"
+                    line-cap="round"
+                    :fill="fill"
+                    empty-fill="rgba(0, 0, 0, .1)"
+                    :animation-start-value="0.0"
+                    :start-angle="90"
+                    insert-mode="append"
+                    :thickness="3"
+                    :show-percent="false">
+                44% with at least n skills <br />🎓
+            </vue-circle>
         </div>
 
 
@@ -39,9 +70,11 @@ import IdCardCollection from "*.vue";
     import PersonResponse from "@/model/PersonResponse";
     import PersonResponseStatistics from "@/model/PersonResponseStatistics";
     import CountStatistics from "@/model/CountStatistics";
+    //@ts-ignore
+    import VueCircle from '@/../node_modules/vue2-circle-progress/dist/vue-circle-progress.js'
 
     @Component({
-        components: {TagWordCloud, Loader}
+        components: {TagWordCloud, Loader, VueCircle}
     })
     export default class Stats extends Vue {
         error = null;
@@ -55,6 +88,10 @@ import IdCardCollection from "*.vue";
         //TODO should be properties, set by queryparams if needed
         count_objective = 100;
         count_tag_objective = 3; //should be >= to count
+
+        get fill() {
+            return {gradient: ["red", "orange", "yellow", "green"]}
+        }
 
         mounted() {
             this.loadData(this.$route.params.id)
