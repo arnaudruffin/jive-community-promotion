@@ -5,7 +5,9 @@
         <div v-if="loading" class="loading">Loading...</div>
         <div v-if="error" class="error">{{ error }}</div>
 
-        <h1 v-if="skillName">One of our top skill: {{skillName}}</h1>
+        <h2 v-if="skillName">One of the top skill in our community: </h2>
+        <h1 v-if="skillName">{{skillName}}</h1>
+        <br/>
         <p v-if="skillName">Here are some people with this skill:</p>
 
         <infinite-slide-bar duration="30s">
