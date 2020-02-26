@@ -1,5 +1,18 @@
 <template>
     <div id="dynamic-component-demo">
+
+        <fab :actions="fabActions"
+             :position="fabPosition"
+             :bg-color="fabBgColor"
+             icon-size="small"
+             @play="onPlay"
+             @pause="onPause"
+             @stats="onStats"
+             @trombi="onTrombi"
+             main-icon="expand_more"
+        ></fab>
+
+
         <div class="demo" v-if="!hideTabs">
             <button
                     v-for="tab in tabs"
@@ -26,20 +39,56 @@
     import Stats from "@/components/Stats.vue";
     import RandomTop5TagMembers from "@/components/RandomTop5TagMembers.vue";
     import RandomMember from "@/components/RandomMember.vue";
-
+    //@ts-ignore
+import fab from 'vue-fab'
 
     @Component({
-        components: {HelloWorld, IdCardCollection, Stats, RandomTop5TagMembers, RandomMember}
+        components: {HelloWorld, IdCardCollection, Stats, RandomTop5TagMembers, RandomMember,fab}
     })
     export default class Slideshow extends Vue {
 
+
+        get fabBgColor() {
+            return this.animationHandle != null?"#EEEEEE":'#778899';
+        }
+        fabPosition= 'top-right';
+
+        private  constantAction = [ {
+            name: 'stats',
+            icon: 'bar_chart'
+        }, {
+            name: 'trombi',
+            icon: 'people'
+        }];
+
+        get fabActions(){
+            if (this.animationHandle != null){
+                //@ts-ignore
+                return  [
+                    {
+                        name: 'pause',
+                        icon: 'pause',
+                        color: 'orange'
+                    }
+                ].concat(this.constantAction)
+            }else{
+                //@ts-ignore
+                return [
+                    {
+                        name: 'play',
+                        icon: 'play_arrow',
+                        color: 'green'
+                    }
+                ].concat(this.constantAction)
+            }
+        }
 
         currentTab = "stats";
         //tabs = ["stats", "random member"];
         tabs = ["stats", "trombi","random top tag", "random member"];
 
         animationHandle: any | null = null;
-        hideTabs = false;
+        hideTabs = true;
 
         TIMER_PERIOD_DEFAULT = process.env.NODE_ENV === 'production' ? 20000 : 6000;
 
@@ -74,6 +123,43 @@
             this.$log.debug("next  tab: ", this.currentTab);
         }
 
+        onPlay(){
+            this.$log.debug("play!");
+            if(this.animationHandle != null) {
+               this.stopAnimation()
+            }
+            this.startAnimation();
+        }
+
+        onPause(){
+            this.stopAnimation();
+        }
+
+        onStats(){
+            this.stopAnimation();
+            this.currentTab = "stats"
+        }
+
+        onTrombi(){
+            this.stopAnimation();
+            this.currentTab = "trombi"
+        }
+
+        get isAnimationPlaying() : boolean {
+            return this.animationHandle != null
+        }
+
+        private startAnimation(){
+            this.$log.debug("starting animation");
+            this.animationHandle = setInterval(this.nextTab, this.timer);
+        }
+
+        private stopAnimation(){
+            this.$log.debug("canceling animation");
+            clearInterval(this.animationHandle);
+            this.animationHandle = null;
+        }
+
         animate() {
             this.$log.debug("animate!");
             if (this.animationHandle != null) {
@@ -93,6 +179,13 @@
             return ((value != null) &&
                 (value !== '') &&
                 !isNaN(Number(value.toString())));
+        }
+
+        cache(){
+            console.log('Cache Cleared');
+        }
+        alert(){
+            alert('Clicked on alert icon');
         }
 
     }
