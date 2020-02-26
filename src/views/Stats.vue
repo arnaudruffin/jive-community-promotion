@@ -11,46 +11,45 @@ import IdCardCollection from "*.vue";
             <p></p>
 
             <vue-circle
-                    :progress="55"
+                    :progress="percentMembersWithPictures"
                     :size="120"
                     :reverse="false"
                     line-cap="round"
-                    :fill="fill"
+
                     empty-fill="rgba(0, 0, 0, .1)"
                     :animation-start-value="0.0"
                     :start-angle="90"
                     insert-mode="append"
                     :thickness="3"
                     :show-percent="false">
-                53% with a photograph <br />📷
+                {{percentMembersWithPictures}}% with a photograph <br />📷
             </vue-circle>
             <vue-circle
-                    :progress="55"
+                    :progress="percentMembers"
                     :size="190"
                     :reverse="false"
                     line-cap="round"
-                    :fill="green"
                     empty-fill="rgba(0, 0, 0, .1)"
                     :animation-start-value="0.0"
                     :start-angle="90"
                     insert-mode="append"
                     :thickness="5"
                     :show-percent="false">
-                <h3>55 membres</h3> we're hoping for 134  <br /> 😉
+                <h3>{{countStatistics.members}} membres</h3> we're hoping for {{count_objective}}  <br /> 😉
             </vue-circle>
             <vue-circle
-                    :progress="55"
+                    :progress="percentMembersWithSufficientNumberOfTags"
                     :size="120"
                     :reverse="false"
                     line-cap="round"
-                    :fill="fill"
+
                     empty-fill="rgba(0, 0, 0, .1)"
                     :animation-start-value="0.0"
                     :start-angle="90"
                     insert-mode="append"
                     :thickness="3"
                     :show-percent="false">
-                44% with at least n skills <br />🎓
+                {{percentMembersWithSufficientNumberOfTags}}% with at least {{count_tag_objective}} skills <br />🎓
             </vue-circle>
         </div>
 
@@ -91,6 +90,21 @@ import IdCardCollection from "*.vue";
 
         get fill() {
             return {gradient: ["red", "orange", "yellow", "green"]}
+        }
+
+        get percentMembers() {
+            const value = this.countStatistics.members / this.count_objective * 100;
+            return Math.round(value);
+        }
+
+        get percentMembersWithPictures() {
+            const value = this.countStatistics.membersWithPictures / this.countStatistics.members * 100;
+            return Math.round(value);
+        }
+
+        get percentMembersWithSufficientNumberOfTags() {
+            const value = this.countStatistics.membersWithASufficientAmountOfTags / this.countStatistics.members * 100;
+            return Math.round(value);
         }
 
         mounted() {
