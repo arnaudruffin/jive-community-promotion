@@ -20,7 +20,7 @@
 <script lang="ts">
 
 
-    import {Component, Vue} from "vue-property-decorator";
+    import {Component, Vue, Watch} from "vue-property-decorator";
     import HelloWorld from "@/components/HelloWorld.vue";
     import IdCardCollection from "@/components/IdCardCollection.vue";
     import Stats from "@/components/Stats.vue";
@@ -40,7 +40,7 @@
         animationHandle : any | null = null;
         hideTabs = false;
 
-        TIMER_PERIOD=  process.env.NODE_ENV === 'production' ? 20000 : 6000;
+        TIMER_PERIOD_DEFAULT=  process.env.NODE_ENV === 'production' ? 20000 : 6000;
 
         get currentTabComponent() {
             switch (this.currentTab) {
@@ -58,6 +58,13 @@
 
         }
 
+        get timer(): number {
+            return Slideshow.isPathParamANumber(this.$route.query.tempo)
+                ? Number(this.$route.query.tempo)*1000 :
+                this.TIMER_PERIOD_DEFAULT;
+        }
+
+
         nextTab(){
             this.currentTab = this.tabs[this.tabs.indexOf(this.currentTab)+1 << 0]
         }
@@ -72,8 +79,21 @@
             }else{
                 this.$log.debug("starting animation");
                 this.hideTabs = true;
-                this.animationHandle = setInterval(this.nextTab, this.TIMER_PERIOD);
+                this.animationHandle = setInterval(this.nextTab, this.timer);
             }
+        }
+
+        @Watch('$route.query.tempo')
+        onTempoChanged(val: string) {
+           // this.animate()
+        }
+
+
+        private static isPathParamANumber(pathParam: string | (string | null)[]): boolean {
+            const value = pathParam as string;
+            return ((value != null) &&
+                (value !== '') &&
+                !isNaN(Number(value.toString())));
         }
 
     }
