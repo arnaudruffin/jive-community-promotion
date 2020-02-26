@@ -23,12 +23,13 @@
     import {Component, Vue} from "vue-property-decorator";
     import HelloWorld from "@/components/HelloWorld.vue";
     import IdCardCollection from "@/components/IdCardCollection.vue";
-    import Stats from "@/views/Stats.vue";
+    import Stats from "@/components/Stats.vue";
     import RandomTop5TagMembers from "@/components/RandomTop5TagMembers.vue";
+    import RandomMember from "@/components/RandomMember.vue";
 
 
     @Component({
-        components: {HelloWorld, IdCardCollection, Stats, RandomTop5TagMembers}
+        components: {HelloWorld, IdCardCollection, Stats, RandomTop5TagMembers, RandomMember}
     })
     export default class Slideshow extends Vue {
 
@@ -49,6 +50,8 @@
                     return "Stats";
                 case "random top tag":
                     return "RandomTop5TagMembers";
+                case "random member":
+                    return "RandomMember";
                 default:
                     return "HelloWorld";
             }

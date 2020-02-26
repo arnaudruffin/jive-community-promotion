@@ -1,13 +1,16 @@
 <template>
 
     <div class="stat" id="card-collection">
+
+        <div v-if="error" class="error">{{ error }}</div>
+
         <!--<h1 class="zoomTarget">{{ $route.params.id }}</h1>-->
         <Loader v-if="loading"/>
         <div v-if="loading" class="loading">Loading...</div>
 
-        <div v-if="error" class="error">{{ error }}</div>
 
-        <div v-if="stat" class="content">
+
+        <div v-else class="content">
             <h1>Community members</h1>
             <ul id="example-1">
                 <li v-for="item in stat" v-bind:key="item.id">
@@ -26,13 +29,7 @@
     import {Response} from "request";
     import ApiClient from "@/ApiClient";
     import PersonResponse from "@/model/PersonResponse";
-
-
-    interface EnhancedPersonResponse extends PersonResponse{
-        skills:string[],
-        picture:string,
-        skills_ellipsis:string[]
-    }
+    import EnhancedPersonResponse from "@/model/EnhancedPersonResponse";
 
     @Component({
         components: {Loader, IdCard}
@@ -53,9 +50,6 @@
             this.loadData(val);
         }
 
-
-
-
         private loadData(tag: string) {
             this.$log.debug("Loading data for tag ", tag);
             this.error = null;
@@ -69,32 +63,11 @@
                     this.error = error;
                     this.loading = false;
                 } else {
-                    let data: EnhancedPersonResponse[] = JSON.parse(body).list;
-                    this.$log.debug(data);
-                    data.forEach(item => {
-                        if (item.photos) {
-                            item.picture = item.photos[0].value
-                        } else {
-                            item.picture = "https://vignette.wikia.nocookie.net/leon-smallwood/images/e/e2/UNKNOWN_PERSON.png/revision/latest?cb=20150903003647"
-                        }
-                        item.skills = item.tags.filter((el: string) => {
-                            return el !== tag
-                        }).slice(0, 4);
-                        if (item.tags.length > 5) {
-                            this.$log.debug("adding .... on skills");
-                            item.skills.push("...")
-                        } else if (item.skills && item.skills.length === 0) {
-                            this.$log.debug("adding ??? on skills");
-                            item.skills.push("???")
-                        }
-                        item.skills_ellipsis = item.skills.map((input: string) => input.length > 24 ? input = `${input.substring(0, 21)}...` : input);
-                        this.$log.debug("skills: ", item.skills_ellipsis);
-                    });
-                    this.stat = data;
+                    let raw_data: PersonResponse[] = JSON.parse(body).list;
+                    this.stat = ApiClient.convertPersonListToEnhancedPersonList(raw_data,tag);
                     this.$log.debug('content retrieved: ', this.stat);
                 }
             });
-
 
         }
 

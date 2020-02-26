@@ -7,7 +7,7 @@ Vue.use(VueRouter);
 const routes = [
     {path: '/', name: 'home', component: Home},
     {path: '/tag/:id/trombi', component: () => import('../views/Trombi.vue')},
-    {path: '/tag/:id/stats', component: () => import('../views/Stats.vue')},
+    {path: '/tag/:id/stats', component: () => import('../components/Stats.vue')},
     {path: '/tag/:id/toptag', component: () => import('../components/RandomTop5TagMembers.vue')},
     {path: '/tag/:id/slideshow', component: () => import('../views/Slideshow.vue')}
 ];

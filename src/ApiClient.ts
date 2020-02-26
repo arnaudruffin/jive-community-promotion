@@ -3,6 +3,7 @@ import {VUE_APP_PROX} from "@/main";
 import PersonResponse from "@/model/PersonResponse";
 import WordCount from "@/model/WordCount";
 import PersonResponseStatistics from "@/model/PersonResponseStatistics";
+import EnhancedPersonResponse from "@/model/EnhancedPersonResponse";
 
 export default class ApiClient {
     public static loadPeopleFromCommunity(tag: string, callback: (error: any, response: Response, body: any) => any) {
@@ -15,6 +16,28 @@ export default class ApiClient {
 
         };
         request.get(url, {headers: headers}, callback);
+    }
+
+    public static convertPersonListToEnhancedPersonList(persons: PersonResponse[],
+                                                        currentTag: string /** to filter it out when counting tags*/): EnhancedPersonResponse[] {
+        const data = persons as EnhancedPersonResponse[];
+        data.forEach(item => {
+            if (item.photos) {
+                item.picture = item.photos[0].value
+            } else {
+                item.picture = "https://vignette.wikia.nocookie.net/leon-smallwood/images/e/e2/UNKNOWN_PERSON.png/revision/latest?cb=20150903003647"
+            }
+            item.skills = item.tags.filter((el: string) => {
+                return el !== currentTag
+            }).slice(0, 4);
+            if (item.tags.length > 5) {
+                item.skills.push("...")
+            } else if (item.skills && item.skills.length === 0) {
+                item.skills.push("???")
+            }
+            item.skills_ellipsis = item.skills.map((input: string) => input.length > 24 ? input = `${input.substring(0, 21)}...` : input);
+        });
+        return data;
     }
 
 

@@ -5,7 +5,7 @@
         <div v-if="loading" class="loading">Loading...</div>
         <div v-if="error" class="error">{{ error }}</div>
 
-        <h1>One of our top skill:</h1>
+        <h1 v-if="skillName">One of our top skill:</h1>
         <h2 v-if="skillName">{{skillName}}</h2>
         <div v-if="people" class="content">
 
@@ -34,8 +34,6 @@
         skillName: string| null = null;
         people: string[]| null = null;
 
-        //TODO should be properties, set by queryparams if needed
-        count_tag_objective = 3; //should be >= to count
         mounted() {
             this.loadData(this.$route.params.id)
         }
@@ -70,16 +68,14 @@
                     this.loading = false;
                 } else {
                     let data: PersonResponse[] = JSON.parse(body).list;
-                    let stats: PersonResponseStatistics = ApiClient.extractStatisticsFromPersonResponse(data,this.count_tag_objective,tag);
+                    let stats: PersonResponseStatistics = ApiClient.extractStatisticsFromPersonResponse(data,99,tag);
 
                     this.skillName = this.randomKey(stats.tags.top5members)  ;
                     this.people = stats.tags.top5members[this.skillName];
 
                     this.$log.debug('random gives  : ', this.skillName);
-
                 }
             });
         }
-
     }
 </script>
