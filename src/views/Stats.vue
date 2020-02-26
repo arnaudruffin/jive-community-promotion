@@ -53,6 +53,7 @@ import IdCardCollection from "*.vue";
             </vue-circle>
         </div>
 
+        <p></p>
 
         <TagWordCloud v-if="tagStatistics.wordCounts" :words="tagStatistics.wordCounts"/>
     </div>
@@ -80,67 +81,26 @@ import IdCardCollection from "*.vue";
         loading = false;
 
         tagStatistics: TagStatistics = {top5members: {}, wordCounts: []};
-        countStatistics: CountStatistics = {
-            members: 0,
-            membersWithASufficientAmountOfTags: 0,
-            membersWithPictures: 0
-        };
-
+        countStatistics: CountStatistics = {members: 0, membersWithASufficientAmountOfTags: 0, membersWithPictures: 0};
 
         get countTagObjective(): number {
-            if (Stats.isPathParamANumber(this.$route.query.skillGoal)){
-                return Number(this.$route.query.skillGoal)
-            } else {
-                return 42
-            }
+            return Stats.isPathParamANumber(this.$route.query.skillGoal) ? Number(this.$route.query.skillGoal) : 3;
         }
 
         get countMemberObjective(): number {
-            if (Stats.isPathParamANumber(this.$route.query.memberGoal)){
-                return Number(this.$route.query.memberGoal)
-            } else {
-                return 42
-            }
-        }
-
-        private static isPathParamANumber(pathParam: string | (string|null)[]): boolean{
-            const  value = pathParam  as string;
-            return ((value != null) &&
-                (value !== '') &&
-                !isNaN(Number(value.toString())));
-        }
-
-        @Watch('$route.query.skillGoal')
-        onGoalChanged(val: string) {
-            this.loadData(this.$route.params.id)
-        }
-
-        get fill() {
-            return {gradient: ["red", "orange", "yellow", "green"]}
+            return Stats.isPathParamANumber(this.$route.query.memberGoal) ? Number(this.$route.query.memberGoal) : 100;
         }
 
         get percentMembers() {
-            const value = this.countStatistics.members / this.countMemberObjective * 100;
-            return Math.round(value);
+            return Math.round(this.countStatistics.members / this.countMemberObjective * 100);
         }
 
         get percentMembersWithPictures() {
-            const value = this.countStatistics.membersWithPictures / this.countStatistics.members * 100;
-            return Math.round(value);
+            return Math.round(this.countStatistics.membersWithPictures / this.countStatistics.members * 100);
         }
 
         get percentMembersWithSufficientNumberOfTags() {
-            const value = this.countStatistics.membersWithASufficientAmountOfTags / this.countStatistics.members * 100;
-            return Math.round(value);
-        }
-
-        mounted() {
-            this.loadData(this.$route.params.id)
-        }
-
-        @Watch('$route.params.id')
-        onRouteChanged(val: string) {
-            this.loadData(val)
+            return Math.round(this.countStatistics.membersWithASufficientAmountOfTags / this.countStatistics.members * 100);
         }
 
         private loadData(tag: string) {
@@ -169,6 +129,32 @@ import IdCardCollection from "*.vue";
 
                 }
             });
+        }
+
+        mounted() {
+            this.loadData(this.$route.params.id)
+        }
+
+        @Watch('$route.params.id')
+        onRouteChanged(val: string) {
+            this.loadData(val)
+        }
+
+        @Watch('$route.query.skillGoal')
+        onGoalChanged(val: string) {
+            this.loadData(this.$route.params.id)
+        }
+
+        @Watch('$route.query.memberGoal')
+        onMemberGoalChanged(val: string) {
+            this.loadData(this.$route.params.id)
+        }
+
+        private static isPathParamANumber(pathParam: string | (string | null)[]): boolean {
+            const value = pathParam as string;
+            return ((value != null) &&
+                (value !== '') &&
+                !isNaN(Number(value.toString())));
         }
 
     }
