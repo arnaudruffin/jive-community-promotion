@@ -57,6 +57,8 @@ export default class ApiClient {
             }
         };
 
+        const  enhancedPersons = ApiClient.convertPersonListToEnhancedPersonList(persons,currentTag);
+
         const skills: any = [];
         persons.forEach(item => {
             result.counts.members++;
@@ -107,10 +109,10 @@ export default class ApiClient {
 
         });
 
-        persons.forEach(item => {
+        enhancedPersons.forEach(item => {
             top5.forEach(top => {
                 if (item.tags.indexOf(top[0]) > -1) {
-                    result.tags.top5members[top[0]].push(item.displayName)
+                    result.tags.top5members[top[0]].push(item)
                 }
             });
         });
