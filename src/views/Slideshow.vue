@@ -2,14 +2,15 @@
     <div id="dynamic-component-demo">
 
         <fab :actions="fabActions"
-             :position="fabPosition"
              :bg-color="fabBgColor"
+             position="bottom-right"
              icon-size="small"
+             main-icon="expand_more"
              @play="onPlay"
              @pause="onPause"
              @stats="onStats"
              @trombi="onTrombi"
-             main-icon="expand_more"
+
         ></fab>
 
 
@@ -33,6 +34,13 @@
 <script lang="ts">
 
 
+
+     interface Act{
+        name:string,
+        icon:string,
+        color:string|undefined|null
+    }
+
     import {Component, Vue} from "vue-property-decorator";
     import HelloWorld from "@/components/HelloWorld.vue";
     import IdCardCollection from "@/components/IdCardCollection.vue";
@@ -51,14 +59,15 @@ import fab from 'vue-fab'
         get fabBgColor() {
             return this.animationHandle != null?"#EEEEEE":'#778899';
         }
-        fabPosition= 'top-right';
 
         private  constantAction = [ {
             name: 'stats',
-            icon: 'bar_chart'
+            icon: 'bar_chart',
+            color: this.fabBgColor
         }, {
             name: 'trombi',
-            icon: 'people'
+            icon: 'people',
+            color: this.fabBgColor
         }];
 
         get fabActions(){
