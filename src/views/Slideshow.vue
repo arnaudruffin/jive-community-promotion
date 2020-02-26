@@ -3,30 +3,20 @@
 
         <fab :actions="fabActions"
              :bg-color="fabBgColor"
-             position="bottom-right"
+             position="top-left"
              icon-size="small"
              main-icon="expand_more"
              @play="onPlay"
              @pause="onPause"
              @stats="onStats"
              @trombi="onTrombi"
+             @member="onRandomMember"
+             @skill="onRandomSkill"
 
         ></fab>
 
-
-        <div class="demo" v-if="!hideTabs">
-            <button
-                    v-for="tab in tabs"
-                    v-bind:key="tab"
-                    v-bind:class="['tab-button', { active: currentTab === tab }]"
-                    v-on:click="currentTab = tab"
-            >
-                {{ tab }}
-            </button>
-        </div>
         <component v-bind:is="currentTabComponent" class="tab"></component>
 
-        <button v-on:click="animate()"> animate</button>
     </div>
 </template>
 
@@ -68,7 +58,17 @@ import fab from 'vue-fab'
             name: 'trombi',
             icon: 'people',
             color: this.fabBgColor
-        }];
+        },
+            {
+                name: 'member',
+                icon: 'person',
+                color: this.fabBgColor
+            },
+            {
+                name: 'skill',
+                icon: 'grade',
+                color: this.fabBgColor
+            }];
 
         get fabActions(){
             if (this.animationHandle != null){
@@ -94,7 +94,7 @@ import fab from 'vue-fab'
 
         currentTab = "stats";
         //tabs = ["stats", "random member"];
-        tabs = ["stats", "trombi","random top tag", "random member"];
+        tabs = ["stats", "trombi","randomSkill", "randomMember"];
 
         animationHandle: any | null = null;
         hideTabs = true;
@@ -107,9 +107,9 @@ import fab from 'vue-fab'
                     return "IdCardCollection";
                 case "stats":
                     return "Stats";
-                case "random top tag":
+                case "randomSkill":
                     return "RandomTop5TagMembers";
-                case "random member":
+                case "randomMember":
                     return "RandomMember";
                 default:
                     return "HelloWorld";
@@ -154,6 +154,18 @@ import fab from 'vue-fab'
             this.currentTab = "trombi"
         }
 
+        onRandomSkill(){
+            this.stopAnimation();
+            this.currentTab = "randomSkill"
+        }
+
+
+        onRandomMember(){
+            this.stopAnimation();
+            this.currentTab = "randomMember"
+        }
+
+
         get isAnimationPlaying() : boolean {
             return this.animationHandle != null
         }
@@ -169,32 +181,11 @@ import fab from 'vue-fab'
             this.animationHandle = null;
         }
 
-        animate() {
-            this.$log.debug("animate!");
-            if (this.animationHandle != null) {
-                this.$log.debug("canceling animation");
-                this.hideTabs = false;
-                clearInterval(this.animationHandle);
-                this.animationHandle = null;
-            } else {
-                this.$log.debug("starting animation");
-                this.hideTabs = true;
-                this.animationHandle = setInterval(this.nextTab, this.timer);
-            }
-        }
-
         private static isPathParamANumber(pathParam: string | (string | null)[]): boolean {
             const value = pathParam as string;
             return ((value != null) &&
                 (value !== '') &&
                 !isNaN(Number(value.toString())));
-        }
-
-        cache(){
-            console.log('Cache Cleared');
-        }
-        alert(){
-            alert('Clicked on alert icon');
         }
 
     }
