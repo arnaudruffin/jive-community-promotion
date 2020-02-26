@@ -22,7 +22,7 @@ import IdCardCollection from "*.vue";
                     insert-mode="append"
                     :thickness="3"
                     :show-percent="false">
-                {{percentMembersWithPictures}}% with a photograph <br />📷
+                {{percentMembersWithPictures}}% with a photograph <br/>📷
             </vue-circle>
             <vue-circle
                     :progress="percentMembers"
@@ -35,7 +35,7 @@ import IdCardCollection from "*.vue";
                     insert-mode="append"
                     :thickness="5"
                     :show-percent="false">
-                <h3>{{countStatistics.members}} membres</h3> we're hoping for {{count_objective}}  <br /> 😉
+                <h3>{{countStatistics.members}} membres</h3> we're hoping for {{countMemberObjective}} <br/> 😉
             </vue-circle>
             <vue-circle
                     :progress="percentMembersWithSufficientNumberOfTags"
@@ -49,7 +49,7 @@ import IdCardCollection from "*.vue";
                     insert-mode="append"
                     :thickness="3"
                     :show-percent="false">
-                {{percentMembersWithSufficientNumberOfTags}}% with at least {{count_tag_objective}} skills <br />🎓
+                {{percentMembersWithSufficientNumberOfTags}}% with at least {{countTagObjective}} skills <br/>🎓
             </vue-circle>
         </div>
 
@@ -79,21 +79,48 @@ import IdCardCollection from "*.vue";
         error = null;
         loading = false;
 
-        tagStatistics: TagStatistics = {top5members: {}, wordCounts:[]};
-        countStatistics : CountStatistics = {  members: 0,
+        tagStatistics: TagStatistics = {top5members: {}, wordCounts: []};
+        countStatistics: CountStatistics = {
+            members: 0,
             membersWithASufficientAmountOfTags: 0,
-            membersWithPictures: 0};
+            membersWithPictures: 0
+        };
 
-        //TODO should be properties, set by queryparams if needed
-        count_objective = 100;
-        count_tag_objective = 3; //should be >= to count
+
+        get countTagObjective(): number {
+            if (Stats.isPathParamANumber(this.$route.query.skillGoal)){
+                return Number(this.$route.query.skillGoal)
+            } else {
+                return 42
+            }
+        }
+
+        get countMemberObjective(): number {
+            if (Stats.isPathParamANumber(this.$route.query.memberGoal)){
+                return Number(this.$route.query.memberGoal)
+            } else {
+                return 42
+            }
+        }
+
+        private static isPathParamANumber(pathParam: string | (string|null)[]): boolean{
+            const  value = pathParam  as string;
+            return ((value != null) &&
+                (value !== '') &&
+                !isNaN(Number(value.toString())));
+        }
+
+        @Watch('$route.query.skillGoal')
+        onGoalChanged(val: string) {
+            this.loadData(this.$route.params.id)
+        }
 
         get fill() {
             return {gradient: ["red", "orange", "yellow", "green"]}
         }
 
         get percentMembers() {
-            const value = this.countStatistics.members / this.count_objective * 100;
+            const value = this.countStatistics.members / this.countMemberObjective * 100;
             return Math.round(value);
         }
 
@@ -121,7 +148,7 @@ import IdCardCollection from "*.vue";
             this.error = null;
             this.loading = true;
 
-            this.tagStatistics = {top5members: {}, wordCounts:[]};
+            this.tagStatistics = {top5members: {}, wordCounts: []};
 
             const skills: any = [];
             ApiClient.loadPeopleFromCommunity(tag, (error: any, response: Response, body: any) => {
@@ -133,7 +160,7 @@ import IdCardCollection from "*.vue";
                     this.loading = false;
                 } else {
                     let data: PersonResponse[] = JSON.parse(body).list;
-                    let stats: PersonResponseStatistics = ApiClient.extractStatisticsFromPersonResponse(data,this.count_tag_objective,tag);
+                    let stats: PersonResponseStatistics = ApiClient.extractStatisticsFromPersonResponse(data, this.countTagObjective, tag);
 
                     this.tagStatistics = stats.tags;
                     this.countStatistics = stats.counts;

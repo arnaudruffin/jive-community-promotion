@@ -53,6 +53,9 @@
             this.loadData(val);
         }
 
+
+
+
         private loadData(tag: string) {
             this.$log.debug("Loading data for tag ", tag);
             this.error = null;
