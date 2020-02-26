@@ -71,7 +71,7 @@ import IdCardCollection from "*.vue";
     import PersonResponseStatistics from "@/model/PersonResponseStatistics";
     import CountStatistics from "@/model/CountStatistics";
     //@ts-ignore
-    import VueCircle from '@/../node_modules/vue2-circle-progress/dist/vue-circle-progress.js'
+    import VueCircle from "vue2-circle-progress"
 
     @Component({
         components: {TagWordCloud, Loader, VueCircle}
