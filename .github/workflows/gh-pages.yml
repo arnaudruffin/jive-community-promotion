@@ -28,6 +28,7 @@ jobs:
 
     - run: npm run build
       env:
+        NODE_ENV: production
         VUE_APP_PROX: ${{ secrets.VUE_APP_PROX }}
 
     - name: Deploy

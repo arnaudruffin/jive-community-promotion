@@ -99,7 +99,7 @@ import fab from 'vue-fab'
         animationHandle: any | null = null;
         hideTabs = true;
 
-        TIMER_PERIOD_DEFAULT = process.env.NODE_ENV === 'production' ? 20000 : 6000;
+        TIMER_PERIOD_DEFAULT = process.env.NODE_ENV === 'production' ? 30*1000 : 6*1000;
 
         get currentTabComponent() {
             switch (this.currentTab) {
