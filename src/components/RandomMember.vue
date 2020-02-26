@@ -45,7 +45,7 @@
         destroyed() {
             this.$log.debug("destroyed");
             // @ts-ignore
-            window.$("#randomMember").click();
+            window.$("#app").click();
         }
 
         @Watch('$route.params.id')

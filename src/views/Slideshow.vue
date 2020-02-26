@@ -1,14 +1,14 @@
 <template>
-    <div id="dynamic-component-demo" >
+    <div id="dynamic-component-demo">
         <div class="demo" v-if="!hideTabs">
-        <button
-                v-for="tab in tabs"
-                v-bind:key="tab"
-                v-bind:class="['tab-button', { active: currentTab === tab }]"
-                v-on:click="currentTab = tab"
-        >
-            {{ tab }}
-        </button>
+            <button
+                    v-for="tab in tabs"
+                    v-bind:key="tab"
+                    v-bind:class="['tab-button', { active: currentTab === tab }]"
+                    v-on:click="currentTab = tab"
+            >
+                {{ tab }}
+            </button>
         </div>
         <component v-bind:is="currentTabComponent" class="tab"></component>
 
@@ -20,7 +20,7 @@
 <script lang="ts">
 
 
-    import {Component, Vue, Watch} from "vue-property-decorator";
+    import {Component, Vue} from "vue-property-decorator";
     import HelloWorld from "@/components/HelloWorld.vue";
     import IdCardCollection from "@/components/IdCardCollection.vue";
     import Stats from "@/components/Stats.vue";
@@ -35,12 +35,13 @@
 
 
         currentTab = "stats";
+        //tabs = ["stats", "random member"];
         tabs = ["stats", "trombi","random top tag", "random member"];
 
-        animationHandle : any | null = null;
+        animationHandle: any | null = null;
         hideTabs = false;
 
-        TIMER_PERIOD_DEFAULT=  process.env.NODE_ENV === 'production' ? 20000 : 6000;
+        TIMER_PERIOD_DEFAULT = process.env.NODE_ENV === 'production' ? 20000 : 6000;
 
         get currentTabComponent() {
             switch (this.currentTab) {
@@ -55,28 +56,32 @@
                 default:
                     return "HelloWorld";
             }
-
         }
 
         get timer(): number {
             return Slideshow.isPathParamANumber(this.$route.query.tempo)
-                ? Number(this.$route.query.tempo)*1000 :
+                ? Number(this.$route.query.tempo) * 1000 :
                 this.TIMER_PERIOD_DEFAULT;
         }
 
 
-        nextTab(){
-            this.currentTab = this.tabs[this.tabs.indexOf(this.currentTab)+1 << 0]
+        nextTab() {
+            let increment = this.tabs.indexOf(this.currentTab) + 1 ;
+            if(increment >= this.tabs.length){
+                increment = 0;
+            }
+            this.currentTab = this.tabs[increment];
+            this.$log.debug("next  tab: ", this.currentTab);
         }
 
         animate() {
             this.$log.debug("animate!");
-            if (this.animationHandle != null){
+            if (this.animationHandle != null) {
                 this.$log.debug("canceling animation");
                 this.hideTabs = false;
-               clearInterval(this.animationHandle);
+                clearInterval(this.animationHandle);
                 this.animationHandle = null;
-            }else{
+            } else {
                 this.$log.debug("starting animation");
                 this.hideTabs = true;
                 this.animationHandle = setInterval(this.nextTab, this.timer);
@@ -115,7 +120,7 @@
     }
 
     .tab {
-        border: 1px solid #ccc;
+        border: 0px solid #ccc;
         padding: 10px;
     }
 </style>
