@@ -83,12 +83,6 @@
             }
         }
 
-        @Watch('$route.query.tempo')
-        onTempoChanged(val: string) {
-           // this.animate()
-        }
-
-
         private static isPathParamANumber(pathParam: string | (string | null)[]): boolean {
             const value = pathParam as string;
             return ((value != null) &&

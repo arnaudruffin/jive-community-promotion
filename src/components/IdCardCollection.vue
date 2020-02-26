@@ -64,11 +64,18 @@
                     this.loading = false;
                 } else {
                     let raw_data: PersonResponse[] = JSON.parse(body).list;
-                    this.stat = ApiClient.convertPersonListToEnhancedPersonList(raw_data,tag);
+                    this.stat = this.shuffle(ApiClient.convertPersonListToEnhancedPersonList(raw_data,tag));
                     this.$log.debug('content retrieved: ', this.stat);
                 }
             });
 
+        }
+        shuffle(a:any[]) {
+            for (let i = a.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [a[i], a[j]] = [a[j], a[i]];
+            }
+            return a;
         }
 
         updated() {
