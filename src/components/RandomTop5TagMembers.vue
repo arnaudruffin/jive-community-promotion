@@ -8,12 +8,13 @@
         <h2 v-if="skillName">One of the top skill in our community: </h2>
         <h1 v-if="skillName">{{skillName}}</h1>
         <br/>
+        <br/>
         <p v-if="skillName">Here are some people with this skill:</p>
 
-        <infinite-slide-bar duration="30s">
+        <infinite-slide-bar duration="30s" :barStyle="{ padding: '40px 0' }">
             <div class="items">
                 <div v-for="item in people" v-bind:key="item.id">
-                    <IdCard class="zoomTarget idcard" data-targetsize="0.65" data-duration="600" :id="item.id"
+                    <IdCard  :id="item.id"
                             :display-name="item.displayName" :photo="item.picture" :tags="item.skills_ellipsis"/>
                 </div>
             </div>
